@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="PrototypeType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="InferenceEngine_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="RuntimeStore_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="RuntimeStore_PartitionCount" DefaultValue="1" />
+    <Parameter Name="RuntimeStore_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="OrchestratorFrontEnd_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="TenantUpdateOrchestrator_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TenantUpdateOrchestrator_PartitionCount" DefaultValue="1" />
+    <Parameter Name="TenantUpdateOrchestrator_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TenantUpdateActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="TenantUpdateActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TenantUpdateActorService_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
+       should match the Name and Version attributes of the ServiceManifest element defined in the 
+       ServiceManifest.xml file. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="InferenceEnginePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="RuntimeStorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="OrchestratorFrontEndPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TenantUpdateOrchestratorPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TenantUpdateActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="InferenceEngine">
+      <StatelessService ServiceTypeName="InferenceEngineType" InstanceCount="[InferenceEngine_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="RuntimeStore">
+      <StatefulService ServiceTypeName="RuntimeStoreType" TargetReplicaSetSize="[RuntimeStore_TargetReplicaSetSize]" MinReplicaSetSize="[RuntimeStore_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[RuntimeStore_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="OrchestratorFrontEnd" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="OrchestratorFrontEndType" InstanceCount="[OrchestratorFrontEnd_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="TenantUpdateOrchestrator">
+      <StatefulService ServiceTypeName="TenantUpdateOrchestratorType" TargetReplicaSetSize="[TenantUpdateOrchestrator_TargetReplicaSetSize]" MinReplicaSetSize="[TenantUpdateOrchestrator_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[TenantUpdateOrchestrator_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="TenantUpdateActorService" GeneratedIdRef="5f185543-8cdc-443e-8a54-bd6e33636036|Persisted">
+      <StatefulService ServiceTypeName="TenantUpdateActorServiceType" TargetReplicaSetSize="[TenantUpdateActorService_TargetReplicaSetSize]" MinReplicaSetSize="[TenantUpdateActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[TenantUpdateActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <!-- The section below creates instances of service types, when an instance of this 
+         application type is created. You can also create one or more instances of service type using the 
+         ServiceFabric PowerShell module.
+         
+         The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
+  </DefaultServices>
+</ApplicationManifest>
